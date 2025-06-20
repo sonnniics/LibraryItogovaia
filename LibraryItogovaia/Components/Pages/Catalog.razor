@@ -1,0 +1,148 @@
+@page "/catalog"
+@using Library.DataBase
+@using Library.Model
+@inject Context Ef
+@inject NavigationManager NavigationManager
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+@rendermode InteractiveServer
+
+<div class="werh">
+    <img src="Iconki/logo (1).svg" alt="logo"/>
+    <div class="werh-title">
+        <img src="Iconki/Библиотека титуль шрифт.svg" alt="БИБЛИОТЕКА"/>
+        <div class="chnopochki">
+            <button @onclick="openmenuchitatel">ЧИТАТЕЛЯМ @if (menuchitatel) { <img src="Iconki/Vector (1).svg"/> } @if(menuchitatel == false){<img src="Iconki/Vector (3).svg"/>}</button>
+            <button @onclick="openmenukatalog">КАТАЛОГ  @if (menukatalog) { <img src="Iconki/Vector (1).svg"/> } @if(menukatalog == false){<img src="Iconki/Vector (3).svg"/>}</button>
+            <button @onclick="openmenupravila">ПРАВИЛА  @if (menupravila) { <img src="Iconki/Vector (1).svg"/> } @if(menupravila == false){<img src="Iconki/Vector (3).svg"/>}</button>
+        </div>
+    </div>
+</div>
+@if (menuchitatel)
+{
+<div class="menuch">
+    <NavLink class="menuch-nav" href="/biletchitatelia">Читательский билет</NavLink>
+    <NavLink class="menuch-nav" href="istoriavidach">История выдачи</NavLink>
+</div>
+}
+@if (menukatalog)
+{
+<div class="menuka">
+    <NavLink class="menuch-nav" href="/catalog">Каталог книг</NavLink>
+    <NavLink class="menuch-nav" href="/">Поиск книг</NavLink>
+</div>
+}
+@if (menupravila)
+{
+<div class="menuprav">
+    <NavLink class="menuch-nav" href="BronirovanieKnigi">Забронировать книгу</NavLink>
+    <NavLink class="menuch-nav" href="pravila_vidachi">Выдача и возврат книг</NavLink>
+</div>
+}
+
+<div class="fon">
+    <div class="bolshoicatalog">
+        <h1>КАТАЛОГ КНИГ</h1>
+    </div>
+    
+    <div class="catalog">
+        
+        <div class="kartochka-knigi">
+            <img src="@testimg"/>
+            <img  class="kartochka-knigi-line" src="Iconki/lineD.svg"/>
+            <div class="kartochka-knigi-description">
+                <h3>Книга: @testknigaName</h3>
+                <h3>Автор: @testName</h3>
+                <h3>Жанр: @testjanr</h3>
+                <button @onclick="() => BronirovatKnigy(1)">ЗАБРОНИРОВАТЬ</button>
+            </div>
+        </div>
+        
+
+        @foreach (var knijechka in _knigas)
+        {
+            <div class="kartochka-knigi">
+                <img src="@knijechka.image"/>
+                <img  class="kartochka-knigi-line" src="Iconki/lineD.svg"/>
+                <div class="kartochka-knigi-description">
+                    <h3>Книга: @knijechka.Name</h3>
+                    <h3>Автор: @knijechka.Avtor.Name</h3>
+                    <h3>Жанр: @knijechka.Janr.Name</h3>
+                    <button @onclick="() => BronirovatKnigy(knijechka.Id)">ЗАБРОНИРОВАТЬ</button>
+                </div>
+            </div>
+        }
+    </div>
+    <div class="niz"><button @onclick="esedesat" class="cnopka">ЕЩЕ</button></div>
+</div>
+
+
+
+@code {
+    private List<Kniga> _knigas = new List<Kniga>();
+    private User? _user = new User();
+    private Vidacha _vidacha = new Vidacha();
+
+    private bool AuthStatus { get; set; } 
+    private string testimg = "test/Пример Книжной Обложки.png";
+    private string testknigaName = "Приключение шурика";
+    private string testName = "Рандомный автор";
+    private string testjanr = "фентези";
+    
+    
+    private int knigaschetchik = 10;
+
+    protected override void OnInitialized()
+    {
+        _knigas = Ef.Knigas.Take(knigaschetchik).ToList();
+    }
+
+    private void esedesat()
+    {
+        knigaschetchik += 10;
+        OnInitialized();
+        StateHasChanged();
+    }
+
+    private async Task BronirovatKnigy( int knigaId)
+    {
+        AuthStatus = await LocalStorage.GetItemAsync<bool>("IsAuth");
+        if (AuthStatus)
+        {
+            var userId = await LocalStorage.GetItemAsync<int>("UserId");
+            var kniga = Ef.Knigas.FirstOrDefault(k => k.Id == knigaId);
+            _user = Ef.Users.FirstOrDefault(user => user!.Id == userId);
+            if (kniga != null && kniga.Bronirovana != true)
+            {
+                kniga.UserId = userId; kniga.User = _user; kniga.Bronirovana = true;
+                Ef.Update(kniga);
+                _vidacha.UserId = userId; _vidacha.User = _user; _vidacha.Date = DateTime.Now; _vidacha.Kniga = kniga; _vidacha.KnigaId = knigaId;
+                Ef.Add(_vidacha);
+                _user.VidachaIds.Add(_vidacha.Id);
+                Ef.Update(_user);
+            }
+            Ef.SaveChanges();
+        }
+        if (AuthStatus == false)
+        {
+            NavigationManager.NavigateTo("/biletchitatelia");
+        }
+    }
+    
+
+    private bool menuchitatel;
+    private bool menukatalog;
+    private bool menupravila;
+
+    private void openmenuchitatel()
+    {
+        menuchitatel = !menuchitatel;
+    }
+    private void openmenukatalog()
+    {
+        menukatalog = !menukatalog;
+    }
+    private void openmenupravila()
+    {
+        menupravila = !menupravila;
+    }
+}

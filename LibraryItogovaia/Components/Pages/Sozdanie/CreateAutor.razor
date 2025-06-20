@@ -1,0 +1,61 @@
+@page "/CreateAutor"
+@using Library.DataBase
+@using Library.Model
+@rendermode InteractiveServer
+@inject Context Ef
+@inject NavigationManager NavigationManager
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+
+<div class="fon4">
+    <div class="input-container">
+        <h1>Создание автора</h1>
+        <div class="input-place">
+            <button @onclick="CreateNewAutor">Принять</button>
+            <div class="input-place-container">
+                <h1>Имя</h1>
+                <input @bind="_autor.Name" type="text"/>
+            </div>
+            <div class="input-place-container">
+                <h1>Фамилия</h1>
+                <input @bind="_autor.Surname" type="text"/>
+            </div>
+            <div class="input-place-container">
+                <h1>Дата рождения</h1><input @_autor.Birthday type="date"/></div>
+        </div>
+    </div>
+</div>
+@code {
+    private Autor _autor = new Autor();
+    
+    private int IdUsera;
+    private bool IsAuth;
+
+    protected override void OnInitialized()
+    {
+        try
+        {
+            IsUserAuth();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+    }
+    private async void IsUserAuth()
+    {
+        IsAuth = await LocalStorage.GetItemAsync<bool>("IsAuth");
+        IdUsera = await LocalStorage.GetItemAsync<int>("UserId");
+        if (IsAuth == false)
+        {
+            NavigationManager.NavigateTo("biletchitatelia");
+        }
+    }
+
+    private void CreateNewAutor()
+    {
+        StateHasChanged();
+        Ef.Add(_autor);
+        Ef.SaveChanges();
+    }
+    
+}

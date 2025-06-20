@@ -1,0 +1,59 @@
+@page "/CreateJanr"
+@using Library.DataBase
+@using Library.Model
+@rendermode InteractiveServer
+@inject Context Ef
+@inject NavigationManager NavigationManager
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+
+<div class="fon4">
+    <div class="input-container">
+        <h1>Создание жанра</h1>
+        <div class="input-place">
+            <button @onclick="CreateNewKniga">Принять</button>
+            <div class="input-place-container">
+                <h1>Название</h1>
+                <input @bind="_janr.Name" type="text"/>
+            </div>
+            <div class="input-place-container">
+                <h1>Описание</h1>
+                <input @bind="_janr.Description" type="text"/>
+            </div>
+        </div>
+    </div>
+</div>
+@code {
+    private Janr _janr = new Janr();
+    
+    private int IdUsera;
+    private bool IsAuth;
+
+    protected override void OnInitialized()
+    {
+        try
+        {
+            IsUserAuth();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+    }
+    private async void IsUserAuth()
+    {
+        IsAuth = await LocalStorage.GetItemAsync<bool>("IsAuth");
+        IdUsera = await LocalStorage.GetItemAsync<int>("UserId");
+        if (IsAuth == false)
+        {
+            NavigationManager.NavigateTo("biletchitatelia");
+        }
+    }
+
+    private void CreateNewKniga()
+    {
+        StateHasChanged();
+        Ef.Add(_janr);
+        Ef.SaveChanges();
+    }
+    
+}

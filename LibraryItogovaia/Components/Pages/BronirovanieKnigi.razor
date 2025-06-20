@@ -1,0 +1,75 @@
+@page "/BronirovanieKnigi"
+@rendermode InteractiveServer
+
+<div class="werh">
+    <img src="Iconki/logo (1).svg" alt="logo"/>
+    <div class="werh-title">
+        <img src="Iconki/Библиотека титуль шрифт.svg" alt="БИБЛИОТЕКА"/>
+        <div class="chnopochki">
+            <button @onclick="openmenuchitatel">ЧИТАТЕЛЯМ @if (menuchitatel) { <img src="Iconki/Vector (1).svg"/> } @if(menuchitatel == false){<img src="Iconki/Vector (3).svg"/>}</button>
+            <button @onclick="openmenukatalog">КАТАЛОГ  @if (menukatalog) { <img src="Iconki/Vector (1).svg"/> } @if(menukatalog == false){<img src="Iconki/Vector (3).svg"/>}</button>
+            <button @onclick="openmenupravila">ПРАВИЛА  @if (menupravila) { <img src="Iconki/Vector (1).svg"/> } @if(menupravila == false){<img src="Iconki/Vector (3).svg"/>}</button>
+        </div>
+    </div>
+</div>
+@if (menuchitatel)
+{
+<div class="menuch">
+    <NavLink class="menuch-nav" href="/biletchitatelia">Читательский билет</NavLink>
+    <NavLink class="menuch-nav" href="istoriavidach">История выдачи</NavLink>
+</div>
+}
+@if (menukatalog)
+{
+<div class="menuka">
+    <NavLink class="menuch-nav" href="/catalog">Каталог книг</NavLink>
+    <NavLink class="menuch-nav" href="/">Поиск книг</NavLink>
+</div>
+}
+@if (menupravila)
+{
+<div class="menuprav">
+    <NavLink class="menuch-nav" href="BronirovanieKnigi">Забронировать книгу</NavLink>
+    <NavLink class="menuch-nav" href="pravila_vidachi">Выдача и возврат книг</NavLink>
+</div>
+}
+<div class="fon">
+    <div class="bolshoicatalog">
+        <h1>Забронировать книгу</h1>
+    </div>
+    <div class="rule">
+        <h1>1. Бронирование возможно как через официальный сайт библиотеки, так и при посещении отделения.<br>
+            2. Для бронирования книги необходим действующий читательский билет.<br>
+            3. Создать читательский билет можно на сайте, заполнив форму с указанием имени, фамилии и даты рождения, или лично в отделении, предоставив эти данные сотруднику библиотеки.<br>
+            4. При бронировании через сайт, после активации учетной записи, пользователь может выбрать интересующие книги и оформить бронирование.<br>
+            5. При бронировании в отделении, читатель предоставляет свои данные сотруднику, который создает электронную запись.<br>
+            6. Бронирование предполагает резервирование книги на определенный срок — 3 дня с момента уведомления.<br>
+            7. Оповещение о готовности книги для выдачи происходит по электронной почте или по телефону, указанным при регистрации.<br>
+            8. Для получения книги необходимо предъявить читательский билет или паспорт, если билет создан через сайт.<br>
+            9. В случае, если бронирование не было подтверждено в установленные сроки, оно аннулируется.<br>
+            10. За повторные нарушения правил бронирования могут применяться ограничения на будущие бронирования.<br></h1>
+    </div>
+    <div class="niz">
+        <a>© 2024 Библиотека имени А. С. Пушкина. Все права защищены. | Контакты: info@library.ru | Адрес: г. Москва, ул. Литературная, 10</a>
+    </div>
+</div>
+
+@code {
+
+private bool menuchitatel;
+private bool menukatalog;
+private bool menupravila;
+
+private void openmenuchitatel()
+{
+menuchitatel = !menuchitatel;
+}
+private void openmenukatalog()
+{
+menukatalog = !menukatalog;
+}
+private void openmenupravila()
+{
+menupravila = !menupravila;
+}
+}

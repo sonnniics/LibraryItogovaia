@@ -1,0 +1,79 @@
+﻿@page "/"
+@rendermode InteractiveServer
+
+<div class="werh">
+    <img src="Iconki/logo (1).svg" alt="logo"/>
+    <div class="werh-title">
+        <img src="Iconki/Библиотека титуль шрифт.svg" alt="БИБЛИОТЕКА"/>
+        <div class="chnopochki">
+            <button @onclick="openmenuchitatel">ЧИТАТЕЛЯМ @if (menuchitatel) { <img src="Iconki/Vector (1).svg"/> } @if(menuchitatel == false){<img src="Iconki/Vector (3).svg"/>}</button>
+            <button @onclick="openmenukatalog">КАТАЛОГ  @if (menukatalog) { <img src="Iconki/Vector (1).svg"/> } @if(menukatalog == false){<img src="Iconki/Vector (3).svg"/>}</button>
+            <button @onclick="openmenupravila">ПРАВИЛА  @if (menupravila) { <img src="Iconki/Vector (1).svg"/> } @if(menupravila == false){<img src="Iconki/Vector (3).svg"/>}</button>
+        </div>
+    </div>
+</div>
+@if (menuchitatel)
+{
+    <div class="menuch">
+        <NavLink class="menuch-nav" href="/biletchitatelia">Читательский билет</NavLink>
+        <NavLink class="menuch-nav" href="istoriavidach">История выдачи</NavLink>
+    </div>
+}
+@if (menukatalog)
+{
+    <div class="menuka">
+        <NavLink class="menuch-nav" href="/catalog">Каталог книг</NavLink>
+        <NavLink class="menuch-nav" href="/">Поиск книг</NavLink>
+    </div>
+}
+@if (menupravila)
+{
+    <div class="menuprav">
+        <NavLink class="menuch-nav" href="BronirovanieKnigi">Забронировать книгу</NavLink>
+        <NavLink class="menuch-nav" href="pravila_vidachi">Выдача и возврат книг</NavLink>
+    </div>
+}
+
+
+<div class="fon">
+    <div class="stroka-poiska">
+        <img src="Iconki/нийти книгу.svg"/>
+        <img src="Iconki/лупа.svg"/>
+    </div>
+    <div class="vedite-zapros">
+        <input @bind="input"/>
+        <button @onclick="Poisc">
+            <img src="Iconki/Vector.svg"/>
+        </button>
+    </div>
+    <div class="niz">
+        <a>© 2024 Библиотека имени А. С. Пушкина. Все права защищены. | Контакты: info@library.ru | Адрес: г. Москва, ул. Литературная, 10</a>
+    </div>
+</div>
+
+@code
+{
+    private string? input { get; set; }
+
+    private bool menuchitatel;
+    private bool menukatalog;
+    private bool menupravila;
+
+    private void openmenuchitatel()
+    {
+        menuchitatel = !menuchitatel;
+    }
+    private void openmenukatalog()
+    {
+        menukatalog = !menukatalog;
+    }
+    private void openmenupravila()
+    {
+        menupravila = !menupravila;
+    }
+
+    private void Poisc()
+    {
+        
+    }
+}

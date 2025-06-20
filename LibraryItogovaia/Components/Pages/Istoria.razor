@@ -1,0 +1,119 @@
+@page "/istoriavidach"
+@using Library.DataBase
+@using Library.Model
+@rendermode InteractiveServer
+@inject Context Ef
+@inject NavigationManager NavigationManager
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+
+
+<div class="werh">
+    <img src="Iconki/logo (1).svg" alt="logo"/>
+    <div class="werh-title">
+        <img src="Iconki/Библиотека титуль шрифт.svg" alt="БИБЛИОТЕКА"/>
+        <div class="chnopochki">
+            <button @onclick="openmenuchitatel">ЧИТАТЕЛЯМ @if (menuchitatel) { <img src="Iconki/Vector (1).svg"/> } @if(menuchitatel == false){<img src="Iconki/Vector (3).svg"/>}</button>
+            <button @onclick="openmenukatalog">КАТАЛОГ  @if (menukatalog) { <img src="Iconki/Vector (1).svg"/> } @if(menukatalog == false){<img src="Iconki/Vector (3).svg"/>}</button>
+            <button @onclick="openmenupravila">ПРАВИЛА  @if (menupravila) { <img src="Iconki/Vector (1).svg"/> } @if(menupravila == false){<img src="Iconki/Vector (3).svg"/>}</button>
+        </div>
+    </div>
+</div>
+@if (menuchitatel)
+{
+<div class="menuch">
+    <NavLink class="menuch-nav" href="/biletchitatelia">Читательский билет</NavLink>
+    <NavLink class="menuch-nav" href="istoriavidach">История выдачи</NavLink>
+</div>
+}
+@if (menukatalog)
+{
+<div class="menuka">
+    <NavLink class="menuch-nav" href="/catalog">Каталог книг</NavLink>
+    <NavLink class="menuch-nav" href="/">Поиск книг</NavLink>
+</div>
+}
+@if (menupravila)
+{
+<div class="menuprav">
+    <NavLink class="menuch-nav" href="BronirovanieKnigi">Забронировать книгу</NavLink>
+    <NavLink class="menuch-nav" href="pravila_vidachi">Выдача и возврат книг</NavLink>
+</div>
+}
+
+
+
+<div class="fon">
+        <div class="bolshoicatalog">
+            <h1>ИСТОРИЯ ВЫДАЧИ</h1>
+        </div> 
+        
+        <div class="catalog">
+            @foreach (var _vidacha in _vidachas)
+            {
+                <div class="kartochka-knigi">
+                    <img src="@_vidacha.Kniga.image"/>
+                    <img class="kartochka-knigi-line" src="Iconki/lineD.svg"/>
+                    <div class="kartochka-knigi-description">
+                        <h3>Книга: @_vidacha.Kniga.Name</h3>
+                        <h3>Автор: @_vidacha.Kniga.Avtor</h3>
+                        <h3>Дата: @_vidacha.Date</h3>
+                        @if (_vidacha.EndDate != null)
+                        {
+                            <h3>Дата возврата: @_vidacha.EndDate</h3>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+</div>
+
+
+@code {
+    private List<Vidacha> _vidachas = new List<Vidacha>();
+    private int userId;
+    private bool IsAuth;
+
+
+    protected override void OnInitialized()
+    {   
+        try
+        {
+            IsUserAuth();
+            if (IsAuth == false)
+            {
+                NavigationManager.NavigateTo("biletchitatelia");
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+        _vidachas = Ef.Vidachas.Where(v => v.UserId == userId).ToList();
+    }
+
+    private async void IsUserAuth()
+    {
+        IsAuth = await LocalStorage.GetItemAsync<bool>("IsAuth");
+        userId = Convert.ToInt16(LocalStorage.GetItemAsync<string>("UserId"));
+    }
+    
+
+    private bool menuchitatel;
+    private bool menukatalog;
+    private bool menupravila;
+
+    private void openmenuchitatel()
+    {
+        menuchitatel = !menuchitatel;
+    }
+
+    private void openmenukatalog()
+    {
+        menukatalog = !menukatalog;
+    }
+
+    private void openmenupravila()
+    {
+        menupravila = !menupravila;
+    }
+}

@@ -1,0 +1,95 @@
+@page "/CreateKniga"
+@using Library.DataBase
+@using Library.Model
+@rendermode InteractiveServer
+@inject Context Ef
+@inject NavigationManager NavigationManager
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+
+<div class="fon4">
+    <div class="input-container">
+        <h1>Создание книги</h1>
+        <div class="input-place">
+            <button @onclick="CreateNewKniga">Принять</button>
+            <div class="input-place-container">
+                <h1>Название</h1>
+                <input @bind="_kniga.Name" type="text"/>
+            </div>
+            <div class="input-place-container">
+                <h1>Описание</h1>
+                <input @bind="_kniga.Description" type="text"/>
+            </div>
+            <div class="input-place-container">
+                <h1>Путь к обложке</h1>
+                <input @bind="_kniga.image" type="text"/>
+            </div>
+            <div class="input-place-container">
+                <h1>Автор (Id)</h1>
+                <input @bind="_kniga.AutorId" type="text"/>
+            </div>
+            <div class="input-place-container">
+                <h1>Жанр (Id)</h1>
+                <input @bind="_kniga.JanrId" type="text"/>
+            </div>
+            <!--<div class="input-place-container">
+                <h1>Автор</h1>
+                <select class="input-place-container" @bind="_kniga.AutorId">
+                    @foreach (var avtor in _autors)
+                    {
+                        <option value="@avtor.Id">@avtor.Name</option>
+                    }
+                </select>
+            </div>
+            <div class="input-place-container">
+                <h1>Жанр</h1>
+                <select @bind="_kniga.JanrId">
+                    @foreach (var jhanre in _janrs)
+                    {
+                        <option @value="@jhanre.Id">@jhanre.Name</option>
+                    }
+                </select>
+            </div>-->
+        </div>
+    </div>
+</div>
+@code {
+    private Kniga _kniga = new Kniga();
+    private List<Autor> _autors = new List<Autor>();
+    private List<Janr> _janrs = new List<Janr>();
+    
+    private int IdUsera;
+    private bool IsAuth;
+
+    protected override void OnInitialized()
+    {
+        _autors = Ef.Autors.ToList();
+        _janrs = Ef.Janrs.ToList();
+        try
+        {
+            IsUserAuth();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+    }
+    private async void IsUserAuth()
+    {
+        IsAuth = await LocalStorage.GetItemAsync<bool>("IsAuth");
+        IdUsera = await LocalStorage.GetItemAsync<int>("UserId");
+        if (IsAuth == false)
+        {
+            NavigationManager.NavigateTo("biletchitatelia");
+        }
+    }
+
+    private void CreateNewKniga()
+    {
+        StateHasChanged();
+        _kniga.image = "test/Пример Книжной Обложки.png";
+        _kniga.Bronirovana = false;
+        Ef.Add(_kniga);
+        Ef.SaveChanges();
+    }
+    
+}
